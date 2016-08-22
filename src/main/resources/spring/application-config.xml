@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.8.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd">
+    
+    <jdbc:embedded-database id="dataSource" type="H2">
+    	<jdbc:script location="classpath:db/schema.sql"/>
+    	<jdbc:script location="classpath:db/data.sql"/>
+    </jdbc:embedded-database>
+    
+    <bean class="org.h2.tools.Server" id="h2Server" factory-method="createWebServer" 
+    		init-method="start" destroy-method="stop">
+    		<constructor-arg value="-web,-webAllowOthers,-webPort,8082" />
+    </bean>
+    
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+    
+    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    	<property name="dataSource" ref="dataSource" />
+    	<property name="packagesToScan" value="ba.pehli.facebook.domain" />
+    	<property name="jpaVendorAdapter">
+    		<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+    	</property>
+    	<property name="jpaProperties" ref="hibernateProperties" />
+    </bean>
+    
+    <util:properties id="hibernateProperties">
+    	<prop key="hibernate.dialect">org.hibernate.dialect.H2Dialect</prop>
+    	<prop key="hibernate.max_fetch_depth">3</prop>
+      	<prop key="hibernate.jdbc.fetch_size">50</prop>
+      	<prop key="hibernate.jdbc.batch_size">10</prop>
+      	<prop key="hibernate.show_sql">false</prop>
+    </util:properties>
+    
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    	<property name="entityManagerFactory" ref="emf" />
+    </bean>
+    
+    <jpa:repositories base-package="ba.pehli.facebook.repository" entity-manager-factory-ref="emf"
+    	transaction-manager-ref="transactionManager"/>
+    
+    <context:component-scan base-package="ba.pehli.facebook.service" />
+    
+    <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+   		<property name="basenames" value="/WEB-INF/lang/messages" />
+   	</bean>
+    
+    <import resource="classpath:spring/security-config.xml"/>
+    
+    <bean id="admin" class="ba.pehli.facebook.domain.User" scope="singleton">
+    	<property name="id" value="0" />
+    	<property name="username" value="admin" />
+    </bean>
+    
+    <bean class="ba.pehli.facebook.config.PostProcessor" />
+
+</beans>

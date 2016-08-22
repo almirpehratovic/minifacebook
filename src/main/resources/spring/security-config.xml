@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- security konfiguracija aplikacije. 
+	1. Za pristup svim resursima aplikacije, izuzev login stranice i statičkih resursa,
+	   korisnik mora biti autenticiran
+	2. U slučaju greške kod autentikacije, login stranici se proslijeđuje parametar ?error
+	   kako bi kontroler mogao razumjeti da se radi o greški
+	3. Ista logika važi i za logout
+	4. Jedan korisnik može biti imati samo jednu aktivnu sesiju. Pokušaj logina će poništiti
+	   njegovu aktivnu sesiju
+	5. Ovaj fajl treba importovati u aplikacioni kontekst kojeg vidi web aplikacija	  
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.1.xsd">
+	
+	<security:global-method-security pre-post-annotations="enabled"/>
+	
+	<security:http use-expressions="true">
+		<security:intercept-url pattern="/login" access="isAnonymous()"/>
+		<security:intercept-url pattern="/register" access="isAnonymous()"/>
+		<security:intercept-url pattern="/api/**" access="isAnonymous()"/>
+		<security:intercept-url pattern="/res/**" access="isAnonymous() or isAuthenticated()"/>
+		<security:intercept-url pattern="/**" access="hasRole('ROLE_USER')"/>
+		<security:form-login login-page="/login" default-target-url="/home" always-use-default-target="true" 
+			authentication-failure-url="/login?error=true"/>
+		<security:logout logout-success-url="/login?logout=true" delete-cookies="JSESSIONID"/>
+		<security:session-management invalid-session-url="/login">
+			<security:concurrency-control max-sessions="1"/>
+		</security:session-management>
+	</security:http>
+	
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:jdbc-user-service data-source-ref="dataSource" 
+				users-by-username-query="select username,password,enabled from users where username=?"
+				authorities-by-username-query="select username,role from users where username=?" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans>
