@@ -4,13 +4,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.CascadeType;
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -19,12 +25,9 @@ import javax.validation.constraints.Size;
 
 import org.apache.log4j.Logger;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.springframework.core.annotation.Order;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name="users")
@@ -44,6 +47,9 @@ public class User implements Serializable{
 	
 	private List<ProfilePicture> pictures = new ArrayList<ProfilePicture>();
 	private List<Post> posts = new ArrayList<Post>();
+	
+	private List<String> statuses;
+	private Map<Integer, String> statusesMap;
 	
 	public User(){
 		logger.debug("##### > new User()");
@@ -193,12 +199,37 @@ public class User implements Serializable{
 	public void setCountry(String country) {
 		this.country = country;
 	}
+	
+	// statusi su obični stringovi i nema potrebe da ih modeliramo kao entitetske objekte
+	@ElementCollection(fetch=FetchType.LAZY)
+	@CollectionTable(name="statuses",joinColumns=@JoinColumn(name="user_id"))
+	@Column(name="text")
+	@OrderBy("id DESC")
+	public List<String> getStatuses() {
+		return statuses;
+	}
+
+	public void setStatuses(List<String> statuses) {
+		this.statuses = statuses;
+	}
+	
+	@ElementCollection(fetch=FetchType.LAZY)
+	@CollectionTable(name="statuses",joinColumns=@JoinColumn(name="user_id"))
+	@MapKeyColumn(name="id")
+	@Column(name="text")
+	public Map<Integer, String> getStatusesMap() {
+		return statusesMap;
+	}
+
+	public void setStatusesMap(Map<Integer, String> statuesMap) {
+		this.statusesMap = statuesMap;
+	}
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", role=" + role
 				+ ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", enabled=" + enabled + ", birthDate=" + birthDate + "]";
+				+ ", enabled=" + enabled + ", birthDate=" + birthDate + ", statuses=" + statusesMap + "]";
 	}
 	
 	

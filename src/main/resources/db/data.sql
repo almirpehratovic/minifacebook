@@ -16,5 +16,8 @@ insert into posts(id,user_id,text) values (3, 2, 'Anyone interested in hanging u
 insert into likes(user_id,post_id) values(2,1);
 insert into likes(user_id,post_id) values(1,3);
 
+insert into statuses(user_id,text) values(1,'I hate Mondays!');
+insert into statuses(user_id,text) values(1,'Fridaaaay...');
+
 insert into obj_ids(obj_type,obj_next_id) values('Post',100);
 insert into obj_ids(obj_type,obj_next_id) values('ProfilePicture',0);

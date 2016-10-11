@@ -78,9 +78,18 @@
 		<property name="order" value="1" />
 	</bean>
 	
-	<bean id="reportTemplate" class="org.springframework.web.servlet.view.jasperreports.JasperReportsPdfView" abstract="true">
+	
+	<bean id="reportTemplate" class="org.springframework.web.servlet.view.jasperreports.JasperReportsMultiFormatView" abstract="true">
+		<property name="formatMappings">
+			<props>
+				<prop key="odt">ba.pehli.facebook.reports.JasperReportsOdtView</prop>
+				<prop key="pdf">org.springframework.web.servlet.view.jasperreports.JasperReportsPdfView</prop>
+				<prop key="xls">org.springframework.web.servlet.view.jasperreports.JasperReportsXlsView</prop>
+				<prop key="html">org.springframework.web.servlet.view.jasperreports.JasperReportsHtmlView</prop>
+				<prop key="csv">org.springframework.web.servlet.view.jasperreports.JasperReportsCsvView</prop>
+			</props>
+		</property>
 		<property name="reportDataKey" value="dataSource" />
-		<!--  <property name="subReportDataKeys" value="subReportDataSource" /> -->
 	</bean>
 	
 	<bean id="postReport" parent="reportTemplate">

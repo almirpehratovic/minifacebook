@@ -38,6 +38,7 @@ public class CommonController {
 	@ExceptionHandler
 	public String errorHandler(Model ui,Exception e){
 		ui.addAttribute("error", e);
+		logger.error(e.getMessage());
 		return "error";
 	}
 	

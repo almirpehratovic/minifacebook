@@ -13,7 +13,7 @@
 <spring:message code="menu.bug" var="mBug" />
 
 <spring:url value="/res/img/report.png" var="imgReport" />
-<spring:url value="/report" var="urlReport"/>
+<spring:url value="/report/pdf" var="urlReport"/>
 <spring:message code="menu.report" var="mReport" />
 
 <spring:url value="/res/img/stream.png" var="imgStream" />

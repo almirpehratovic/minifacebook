@@ -40,6 +40,14 @@ create table profile_pictures(
 	constraint fk_profile_pictures_1 foreign key (user_id) references users(id)
 );
 
+create table statuses(
+	id int not null auto_increment,
+	user_id int not null,
+	text varchar(4000),
+	primary key (id),
+	constraint fk_status_1 foreign key (user_id) references users(id)
+);
+
 create table obj_ids (
     obj_type varchar(40) not null,
     obj_next_id int not null,

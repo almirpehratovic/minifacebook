@@ -38,6 +38,8 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.jasperreports.JasperReportsPdfView;
+import org.springframework.web.servlet.view.jasperreports.JasperReportsXlsView;
 
 import ba.pehli.facebook.domain.Post;
 import ba.pehli.facebook.domain.ProfilePicture;
@@ -95,6 +97,8 @@ public class UserController {
 			user = userService.findByUsername(userDetails.getUsername());
 			ui.addAttribute("user", user);
 		}
+		
+		logger.info("##### > " + user);
 		
 		ui.addAttribute("posts", postService.findAll());
 		ui.addAttribute("post", new Post());
@@ -240,14 +244,14 @@ public class UserController {
 	 * @param locale
 	 * @return
 	 */
-	@RequestMapping(value="/report", method=RequestMethod.GET)
-	public String report(Model ui,Locale locale){
+	@RequestMapping(value="/report/{format}", method=RequestMethod.GET)
+	public String report(@PathVariable String format,Model ui,Locale locale){
 		ui.addAttribute("title", messageSource.getMessage("post.report.title", null, locale));
 		ui.addAttribute("colDateTime", messageSource.getMessage("post.dateTime", null, locale));
 		ui.addAttribute("colText", messageSource.getMessage("post.postText", null, locale));
 		ui.addAttribute("like", messageSource.getMessage("post.like2", null, locale));
 		ui.addAttribute("dataSource", postService.findAll());
-		// ui.addAttribute("subReportDataSource", postService.findAll());
+		ui.addAttribute("format",format);
 		return "postReport";
 	}
 	
@@ -269,6 +273,7 @@ public class UserController {
 				ui.addAttribute("colText", messageSource.getMessage("post.text", null, locale));
 				ui.addAttribute("like", messageSource.getMessage("post.like2", null, locale));
 				ui.addAttribute("dataSource", postService.findAll());
+				ui.addAttribute("format", "pdf");
 				// ui.addAttribute("subReportDataSource", postService.findAll());
 				return "postReport";
 			}
